@@ -1,0 +1,15 @@
+dataset: METR-LA
+raw_dir: data/raw/METR-LA
+output_dir: data/processed/METR-LA
+null_value: 0.0
+sources:
+  values:
+    filename: METR-LA.csv
+    url: https://zenodo.org/api/records/5146275/files/METR-LA.csv/content
+    algorithm: sha256
+    checksum: 5fa498de0c90f5ff9b67e7cf9654bec031a803b320a8eb13d48021b9983bec82
+  graph:
+    filename: adj_mx.pkl
+    url: https://raw.githubusercontent.com/liyaguang/DCRNN/master/data/sensor_graph/adj_mx.pkl
+    algorithm: sha256
+    checksum: a35687c6e15aa228dc45027b0ed2a0ea0f4ec78f573deb992c595092d12f61b3

@@ -1,0 +1,15 @@
+name: metr_la_persistence
+dataset: METR-LA
+data_path: data/processed/METR-LA
+model: persistence
+input_len: 12
+output_len: 12
+split_ratios: [0.7, 0.1, 0.2]
+horizons: [3, 6, 12]
+seed: 42
+results_dir: results/METR-LA
+rescale: true
+model_params:
+  target_feature: speed
+  null_value: 0.0
+  fallback_strategy: train_mean

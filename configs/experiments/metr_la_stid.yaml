@@ -1,0 +1,28 @@
+name: metr_la_stid
+dataset: METR-LA
+data_path: data/processed/METR-LA
+model: stid
+input_len: 12
+output_len: 12
+split_ratios: [0.7, 0.1, 0.2]
+horizons: [3, 6, 12]
+seed: 42
+results_dir: results/METR-LA
+rescale: true
+model_params:
+  target_feature: speed
+  null_value: 0.0
+  epochs: 100
+  batch_size: 64
+  learning_rate: 0.002
+  weight_decay: 0.0001
+  patience: 15
+  input_hidden_size: 32
+  spatial_hidden_size: 32
+  tid_hidden_size: 32
+  diw_hidden_size: 32
+  num_layers: 3
+  num_time_in_day: 288
+  lr_milestones: [1, 50, 80]
+  lr_gamma: 0.5
+  max_grad_norm: 5.0

@@ -153,3 +153,18 @@ class ArtifactStore:
             if os.path.exists(temporary_name):
                 os.unlink(temporary_name)
         return path
+
+
+def ensure_clean_training_state(run_dir: Path) -> None:
+    """训练后端启动前拒绝残留 checkpoint，避免 easytorch 静默续跑中断 run。
+
+    中断的训练 run 若被 --resume，项目层会整跑训练，但 easytorch 可能从残留的
+    epoch checkpoint 自动恢复；续跑与干净重跑轨迹不同且产物不可区分，因此直接失败。
+    """
+
+    checkpoint_dir = run_dir / "checkpoint"
+    if checkpoint_dir.exists() and any(checkpoint_dir.rglob("*.pt")):
+        raise RunConflictError(
+            f"run {run_dir.name!r} contains stale training checkpoints; "
+            "restart semantics would be ambiguous, use --force-new-run"
+        )

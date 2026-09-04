@@ -46,16 +46,20 @@ def _normalized_config(config: dict[str, Any]) -> dict[str, Any]:
 
 
 def _validate_finite_metrics(metrics: dict[str, Any], run_dir: Path) -> None:
-    sections = [metrics.get("overall")]
+    raw_sections: list[Any] = [metrics.get("overall")]
     horizons = metrics.get("horizons")
     if isinstance(horizons, dict):
-        sections.extend(horizons.values())
-    if not sections or any(
-        not isinstance(section, dict)
-        or any(not math.isfinite(float(value)) for value in section.values())
-        for section in sections
-    ):
+        raw_sections.extend(horizons.values())
+    sections = [s for s in raw_sections if isinstance(s, dict)]
+    if not sections or len(sections) != len(raw_sections):
         raise ValueError(f"non-finite metric in {run_dir}")
+    for section in sections:
+        for value in section.values():
+            # bool 是 int 子类但不是合法指标值
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError(f"non-numeric metric in {run_dir}")
+            if not math.isfinite(float(value)):
+                raise ValueError(f"non-finite metric in {run_dir}")
 
 
 def _atomic_json(path: Path, payload: dict[str, Any]) -> None:

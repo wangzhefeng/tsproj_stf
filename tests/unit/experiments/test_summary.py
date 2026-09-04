@@ -123,3 +123,15 @@ def test_rejects_non_finite_metrics(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="non-finite metric"):
         summarize_runs(tmp_path, "stid", seeds=(42, 43))
+
+
+def test_rejects_non_numeric_metric_values(tmp_path: Path) -> None:
+    write_run(tmp_path, "stid", 42, 1.0)
+    write_run(tmp_path, "stid", 43, 2.0)
+    metrics_path = tmp_path / "stid-seed42" / "metrics.json"
+    metrics = json.loads(metrics_path.read_text())
+    metrics["overall"]["MAE"] = "not-a-number"
+    metrics_path.write_text(json.dumps(metrics))
+
+    with pytest.raises(ValueError, match="non-numeric metric"):
+        summarize_runs(tmp_path, "stid", seeds=(42, 43))

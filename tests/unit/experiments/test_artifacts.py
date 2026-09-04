@@ -8,6 +8,7 @@ import yaml
 from tsproj_stf.experiments.artifacts import (
     ArtifactStore,
     RunConflictError,
+    ensure_clean_training_state,
     fingerprint_bytes,
 )
 
@@ -80,6 +81,18 @@ def test_reports_different_config_as_conflict(tmp_path: Path) -> None:
 
     with pytest.raises(RunConflictError, match="different resolved config"):
         ArtifactStore.initialize(tmp_path, "run-42", config(seed=43))
+
+
+def test_ensure_clean_training_state_rejects_stale_checkpoints(tmp_path: Path) -> None:
+    store = ArtifactStore.initialize(tmp_path, "run-42", config())
+
+    ensure_clean_training_state(store.run_dir)
+
+    stale = store.run_dir / "checkpoint" / "abc123" / "STID_089.pt"
+    stale.parent.mkdir(parents=True)
+    stale.write_bytes(b"fake")
+    with pytest.raises(RunConflictError, match="--force-new-run"):
+        ensure_clean_training_state(store.run_dir)
 
 
 def test_different_seed_run_ids_do_not_conflict(tmp_path: Path) -> None:

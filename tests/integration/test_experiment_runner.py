@@ -191,10 +191,10 @@ def test_runs_stid_for_one_cpu_epoch_and_saves_checkpoint(tmp_path: Path) -> Non
     assert np.isfinite(result.metrics["overall"]["MAE"])
 
     (result.run_dir / "run.log").unlink()
-    resumed = run_experiment(config, resume=True)
-    backend_logs = "\n".join(
-        path.read_text(encoding="utf-8")
-        for path in result.run_dir.rglob("run_*.log")
-    )
-    assert resumed.run_dir == result.run_dir
-    assert "Resume training" in backend_logs
+    # 中断的训练 run 残留 checkpoint：resume 语义歧义，必须响亮失败
+    with pytest.raises(RunConflictError, match="stale training checkpoints"):
+        run_experiment(config, resume=True)
+
+    fresh = run_experiment(config, force_new_run=True)
+    assert fresh.run_dir != result.run_dir
+    assert np.isfinite(fresh.metrics["overall"]["MAE"])

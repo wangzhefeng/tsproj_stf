@@ -16,7 +16,11 @@ from tsproj_stf.baselines import persistence_forecast
 from tsproj_stf.data.adapters import ProjectForecastingDataset
 from tsproj_stf.data.split import chronological_split
 from tsproj_stf.evaluation import evaluate_horizons, evaluate_metrics
-from tsproj_stf.experiments.artifacts import ArtifactStore, fingerprint_file
+from tsproj_stf.experiments.artifacts import (
+    ArtifactStore,
+    ensure_clean_training_state,
+    fingerprint_file,
+)
 from tsproj_stf.experiments.config import ExperimentConfig
 
 
@@ -241,10 +245,12 @@ def run_experiment(
     elif config.model == "stid":
         from tsproj_stf.experiments.stid import run_stid_backend
 
+        ensure_clean_training_state(store.run_dir)
         prediction, targets, targets_observed = run_stid_backend(config, store)
     else:
         from tsproj_stf.experiments.graph_wavenet import run_graph_wavenet_backend
 
+        ensure_clean_training_state(store.run_dir)
         prediction, targets, targets_observed = run_graph_wavenet_backend(config, store)
     metrics = _standard_metrics(prediction, targets, targets_observed, config.horizons)
 

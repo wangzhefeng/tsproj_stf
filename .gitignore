@@ -219,3 +219,9 @@ __marimo__/
 
 # macOS
 .DS_Store
+
+# STF datasets and experiment artifacts
+/data/raw/
+/data/processed/
+/results/
+/checkpoints/

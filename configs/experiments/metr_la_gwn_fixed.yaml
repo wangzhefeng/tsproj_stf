@@ -1,0 +1,34 @@
+name: metr_la_gwn_fixed
+dataset: METR-LA
+data_path: data/processed/METR-LA
+model: graph_wavenet
+input_len: 12
+output_len: 12
+split_ratios: [0.7, 0.1, 0.2]
+horizons: [3, 6, 12]
+seed: 42
+results_dir: results/METR-LA
+rescale: true
+model_params:
+  target_feature: speed
+  null_value: 0.0
+  graph_mode: fixed
+  graph_name: physical
+  epochs: 15
+  test_interval: 16
+  batch_size: 64
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  patience: 5
+  residual_channels: 4
+  dilation_channels: 4
+  skip_channels: 16
+  end_channels: 32
+  kernel_size: 2
+  dilations: [1, 2, 4, 4]
+  diffusion_order: 2
+  adaptive_embedding_dim: 10
+  dropout: 0.3
+  lr_milestones: [8, 12]
+  lr_gamma: 0.5
+  max_grad_norm: 5.0

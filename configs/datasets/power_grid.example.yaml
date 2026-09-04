@@ -1,0 +1,14 @@
+dataset: POWER-GRID
+csv_path: data/raw/POWER-GRID/power.csv
+output_dir: data/processed/POWER-GRID
+timestamp_column: timestamp
+node_ids: [substation_a, substation_b]
+feature_columns:
+  load:
+    substation_a: load_a
+    substation_b: load_b
+  price:
+    substation_a: price_a
+    substation_b: price_b
+target_features: [load]
+fill_value: 0.0

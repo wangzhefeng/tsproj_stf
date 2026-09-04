@@ -28,35 +28,17 @@ We propose a novel deep learning framework, **STGCN**, to tackle time series pre
 
 Traffic forecast is a typical time-series prediction problem, i.e. predicting the most likely traffic measurements (e.g. speed or traffic flow) in the next $H$ time steps given the previous $M$ observations from traffic network $G$ as,
 
-[![[raw/assets/attachments/deeplearning/Image 60.svg]]](https://camo.githubusercontent.com/8d8ba847dc34f82eec0043d7dde65fd4e4d95f1ce9496564fbd191d49369ce19/68747470733a2f2f6c617465782e636f6465636f67732e636f6d2f7376672e696d6167653f5c6c617267652673706163653b5c6861747b767d5f7b742b317d2c2673706163653b2e2e2e2c2673706163653b5c6861747b767d5f7b742b487d3d5c6d6174686f707b5c6172675c6d61787d5f7b765f7b742b317d2c2673706163653b2e2e2e2c2673706163653b765f7b742b487d7d2673706163653b5c6c6f672673706163653b5028765f7b742b317d2c2673706163653b2e2e2e2c765f7b742b487d7c765f7b742d4d2b317d2c2673706163653b2e2e2e2c765f743b4729)
+$$\hat{v}_{t+1}, \dots, \hat{v}_{t+H} = \arg\max_{v_{t+1}, \dots, v_{t+H}} \log P(v_{t+1}, \dots, v_{t+H} \mid v_{t-M+1}, \dots, v_t; G)$$
 
 **Fig.1 Graph-structured traffic data.**  
-Each $v
-    t$ indicates a frame of current traffic status at time step $t$ , which is recorded in a graph-structured data matrix.
+Each $v_t$ indicates a frame of current traffic status at time step $t$, which is recorded in a graph-structured data matrix.
 
 ## Network Structure
 
-[![[raw/assets/attachments/deeplearning/STGCN.png]]](https://github.com/VeritasYin/STGCN_IJCAI-18/blob/master/figures/STGCN.png)
+![Fig.2 STGCN architecture](https://raw.githubusercontent.com/VeritasYin/STGCN_IJCAI-18/master/figures/STGCN.png)
 
 **Fig. 2 Architecture of spatio-temporal graph convolutional networks.**  
-The framework STGCN consists of two spatio-temporal convolutional blocks (ST-Conv blocks) and a fully-connected output layer in the end. Each ST-Conv block contains two temporal gated convolution layers and one spatial graph convolution layer in the middle. The residual connection and bottleneck strategy are applied inside each block. The input $v
-    
-      t
-      −
-      M
-      +
-      1
-    
-  
-  ,
-  .
-  .
-  .
-  ,
-  
-    v
-    t$ is uniformly processed by ST-Conv blocks to explore spatial and temporal dependencies coherently. Comprehensive features are integrated by an output layer to generate the final prediction $v
-      ^$ .
+The framework STGCN consists of two spatio-temporal convolutional blocks (ST-Conv blocks) and a fully-connected output layer in the end. Each ST-Conv block contains two temporal gated convolution layers and one spatial graph convolution layer in the middle. The residual connection and bottleneck strategy are applied inside each block. The input $v_{t-M+1}, \dots, v_t$ is uniformly processed by ST-Conv blocks to explore spatial and temporal dependencies coherently. Comprehensive features are integrated by an output layer to generate the final prediction $\hat{v}$.
 
 ## Results
 
@@ -111,7 +93,9 @@ Note: please replace the `$num_route` with the number of routes in your dataset.
 The standard time interval is set to 5 minutes. Thus, every node of the road graph contains **288** data points per day (day\_slot = 288). The linear interpolation method is used to fill missing values after data cleaning. In addition, data input are normalized by Z-Score method.  
 In PeMSD7, the adjacency matrix of the road graph is computed based on the distances among stations in the traffic network. The weighted adjacency matrix W can be formed as,
 
-All of our experiments use 60 minutes as the historical time window, a.k.a. 12 observed data points (M = 12) are used to forecast traffic conditions in the next 15, 30, and 45 minutes (H = 3, 6, 9).
+$$w_{ij} = \begin{cases} \exp\left(-\frac{d_{ij}^2}{\sigma^2}\right), & i \neq j \text{ and } \exp\left(-\frac{d_{ij}^2}{\sigma^2}\right) \geq \epsilon \\ 0, & \text{otherwise} \end{cases}$$
+
+其中 $d_{ij}$ 为站点 $i$、$j$ 之间的距离，$\sigma^2$ 和 $\epsilon$ 用于控制矩阵的稀疏度与分布（$\epsilon$ 为阈值，低于该值的权重直接置零）。All of our experiments use 60 minutes as the historical time window, a.k.a. 12 observed data points (M = 12) are used to forecast traffic conditions in the next 15, 30, and 45 minutes (H = 3, 6, 9).
 
 ## Model Details
 
@@ -160,6 +144,10 @@ Note: it normally takes around 6s on a NVIDIA TITAN Xp for one epoch with the ba
 
 ## Updates
 
+**Jun. 13, 2026**:
+
+- PeMSD7-L (1,026 nodes) 站点列表 (Station List) 显式发布。
+
 **Feb. 22, 2022**:
 
 - Sensor Station List of PeMSD7-M released.
@@ -192,3 +180,10 @@ Please refer to our paper. Bing Yu\*, Haoteng Yin\*, Zhanxing Zhu. [Spatio-tempo
     year={2018}
 }
 ```
+
+## 其他补充信息（2026-08 更新笔记时核验）
+
+- **License**: BSD 2-Clause
+- **仓库热度**: ~1.2k stars / 327 forks（2026-08 查询）
+- **IJCAI 正式版 PDF**: https://www.ijcai.org/proceedings/2018/0505.pdf
+- 原实现基于 TensorFlow >= 1.9，环境较旧；**复现建议直接用 PyG Temporal 的 `STConv` 层**（PyTorch），见上文 Requirements 一节链接。
